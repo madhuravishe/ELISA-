@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ELISA Diagnosis Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Background animation with floating particles */
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+      background: linear-gradient(120deg, #2c5364, #203a43, #0f2027);
+      animation: gradientMove 15s infinite ease;
+      color: #fff;
+      position: relative;
+      padding: 40px 20px;
+    }
+
+    @keyframes gradientMove {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://i.ibb.co/7QpKsCX/particles.png');
+      animation: float 60s linear infinite;
+      opacity: 0.2;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0% {background-position: 0 0;}
+      100% {background-position: 1000px 1000px;}
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      padding: 40px;
+      max-width: 1000px;
+      margin: auto;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 255, 255, 0.2);
+      animation: fadeIn 1.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #00eaff;
+      text-shadow: 0 0 5px #00eaff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 30px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: slideIn 1s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {opacity: 0; transform: translateY(50px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    th, td {
+      padding: 14px 18px;
+      text-align: center;
+      font-size: 1.1rem;
+      border: 1px solid #33eaff;
+      background: rgba(255,255,255,0.05);
+    }
+
+    th {
+      background: #00eaff;
+      color: #000;
+      text-transform: uppercase;
+    }
+
+    tr:hover td {
+      background: rgba(0, 234, 255, 0.1);
+      transform: scale(1.01);
+    }
+
+    .result, .conclusion {
+      background: rgba(0, 234, 255, 0.1);
+      padding: 20px;
+      border-left: 5px solid #00eaff;
+      border-radius: 12px;
+      margin-top: 30px;
+      box-shadow: 0 5px 20px rgba(0,255,255,0.1);
+      animation: fadeUp 1.2s ease;
+    }
+
+    .result ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .result li {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .image-container {
+      text-align: center;
+      margin: 30px 0;
+      animation: zoomIn 1.5s ease;
+    }
+
+    .image-container img {
+      width: 90%;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0, 234, 255, 0.4);
+      transition: transform 0.3s ease;
+    }
+
+    .image-container img:hover {
+      transform: scale(1.05);
+    }
+
+    .print-btn {
+      margin: 30px auto 0;
+      padding: 14px 30px;
+      font-size: 1.2rem;
+      background: #00eaff;
+      color: #000;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      display: block;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #00eaff, 0 0 20px #00eaff;
+    }
+
+    .print-btn:hover {
+      background: #00bcd4;
+      transform: scale(1.1);
+      box-shadow: 0 0 20px #00eaff, 0 0 40px #00eaff;
+    }
+
+    /* Updated graphical analysis size */
+    .chart-container {
+      background: rgba(0, 234, 255, 0.1);
+      padding: 20px 15px; /* Reduced padding */
+      margin-top: 20px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,255,255,0.1);
+      animation: fadeUp 1.5s ease;
+      max-width: 600px; /* Reduced max width */
+      margin: auto;
+    }
+
+    .chart-container h2 {
+      text-align: center;
+      color: #00eaff;
+      margin-bottom: 15px; /* Reduced margin */
+    }
+
+    canvas {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 15px; /* Reduced padding */
+      width: 100%; /* Make canvas responsive */
+      height: 200px; /* Set fixed height */
+    }
+
+    @media print {
+      .print-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Diagnosis of Disease Based on Immune Response</h1>
+    <h2>Using ELISA Technique</h2>
+
+    <h2>Observation Table</h2>
+    <table>
+      <tr>
+        <th>Patient</th>
+        <th>Dilution 1:2</th>
+        <th>Dilution 1:10</th>
+        <th>Dilution 1:100</th>
+        <th>Interpretation</th>
+      </tr>
+      <tr>
+        <td>Patient A</td>
+        <td>Yellow (positive)</td>
+        <td>Yellow (positive)</td>
+        <td>Yellow (positive)</td>
+        <td>Strong positive – Likely SLE</td>
+      </tr>
+      <tr>
+        <td>Patient B</td>
+        <td>Yellow (positive)</td>
+        <td>Grey (negative)</td>
+        <td>Grey (negative)</td>
+        <td>Weak positive – Needs retesting</td>
+      </tr>
+      <tr>
+        <td>Patient C</td>
+        <td>Grey (negative)</td>
+        <td>Grey (negative)</td>
+        <td>Grey (negative)</td>
+        <td>Negative – Probably no SLE</td>
+      </tr>
+      <tr>
+        <td>Positive Control</td>
+        <td>Yellow (positive)</td>
+        <td>Yellow (positive)</td>
+        <td>Yellow (positive)</td>
+        <td>Expected Positive</td>
+      </tr>
+      <tr>
+        <td>Negative Control</td>
+        <td>Grey (negative)</td>
+        <td>Grey (negative)</td>
+        <td>Grey (negative)</td>
+        <td>Expected Negative</td>
+      </tr>
+    </table>
+
+    <div class="image-container">
+      <img src="result ELISA.png" alt="ELISA Result">
+    </div>
+
+    <div class="result">
+      <h2>Result</h2>
+      <ul>
+        <li><strong>Patient A:</strong> All dilutions positive. Likely SLE.</li>
+        <li><strong>Patient B:</strong> 1:2 positive only. Needs further testing.</li>
+        <li><strong>Patient C:</strong> All negative. Probably does not have SLE.</li>
+      </ul>
+    </div>
+
+    <!-- Smaller Chart Section with Pie and Line Graph -->
+    <div class="chart-container">
+      <h2>Graphical Analysis</h2>
+      <canvas id="elisaPieChart"></canvas>
+      <canvas id="elisaLineChart"></canvas>
+    </div>
+
+    <div class="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        The ELISA test successfully detected the presence of anti-DNA antibodies, which are associated with SLE.
+        Patient A is likely to have SLE due to a strong immune response.
+        Patient B shows a weak immune response and should undergo further testing.
+        Patient C likely does not have SLE due to the absence of antibody detection.
+      </p>
+    </div>
+
+    <button class="print-btn" onclick="window.print()">Download / Print Report</button>
+  </div>
+
+  <script>
+    // Pie Chart for ELISA Results
+    const pieCtx = document.getElementById('elisaPieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Strong Positive (A)', 'Weak Positive (B)', 'Negative (C)'],
+        datasets: [{
+          label: 'ELISA Results',
+          data: [1, 1, 1],
+          backgroundColor: [
+            'rgba(0, 255, 255, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(255, 99, 132, 0.7)'
+          ],
+          borderColor: [
+            'rgba(0, 255, 255, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(255, 99, 132, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#ffffff',
+              font: {
+                size: 14
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Line Graph for ELISA Results
+    const lineCtx = document.getElementById('elisaLineChart').getContext('2d');
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['Dilution 1:2', 'Dilution 1:10', 'Dilution 1:100'],
+        datasets: [{
+          label: 'Antibody Concentration',
+          data: [100, 50, 20], // Example concentration values
+          borderColor: 'rgba(0, 255, 255, 1)',
+          backgroundColor: 'rgba(0, 255, 255, 0.3)',
+          borderWidth: 2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#ffffff',
+              font: {
+                size: 14
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.raw}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
