@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ELISA Diagnosis Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #f6d365, #fda085); /* Gradient background */
+            background: linear-gradient(135deg, #f6d365, #fda085);
             margin: 0;
             padding: 20px;
             animation: fadeIn 1s ease-in-out;
@@ -23,7 +24,7 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 900px;
+            max-width: 1000px;
             margin: auto;
             transition: box-shadow 0.3s ease;
         }
@@ -35,14 +36,12 @@
         h1, h2 {
             color: #2c3e50;
             text-align: center;
-            font-size: 2rem;
             margin-bottom: 10px;
         }
 
         h2 {
-            font-size: 1.5rem;
             color: #8e44ad;
-            margin-top: 0;
+            margin-top: 20px;
         }
 
         table {
@@ -55,8 +54,6 @@
             border: 1px solid #ddd;
             padding: 15px;
             text-align: center;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
         }
 
         th {
@@ -74,7 +71,6 @@
             padding: 20px;
             border-left: 5px solid #8e44ad;
             border-radius: 10px;
-            transition: background-color 0.5s ease;
         }
 
         .result h2, .conclusion h2 {
@@ -113,8 +109,12 @@
             transform: scale(1.05);
         }
 
+        canvas {
+            margin-top: 30px;
+        }
+
         @media print {
-            .print-btn {
+            .print-btn, canvas {
                 display: none;
             }
         }
@@ -172,14 +172,18 @@
         </table>
 
         <div class="result">
-            <h2>Result</h2>
-            <img id="elisa" src="result ELISA.png" alt="Genetic Disease Image">
+            <h2>Result Summary</h2>
+            <img id="elisa" src="result ELISA.png" alt="Genetic Disease Image" style="max-width: 100%; border-radius: 10px; margin: 10px 0;">
             <ul>
                 <li><strong>Patient A:</strong> All dilutions positive. Likely SLE.</li>
                 <li><strong>Patient B:</strong> 1:2 positive only. Needs further testing.</li>
                 <li><strong>Patient C:</strong> All negative. Probably does not have SLE.</li>
             </ul>
         </div>
+
+        <h2>Visual Representation</h2>
+        <canvas id="barChart" width="600" height="400"></canvas>
+        <canvas id="pieChart" width="600" height="400"></canvas>
 
         <div class="conclusion">
             <h2>Conclusion</h2>
@@ -195,7 +199,62 @@
     </div>
 
     <script>
-        console.log("ELISA diagnosis page loaded successfully.");
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Patient A', 'Patient B', 'Patient C'],
+                datasets: [
+                    {
+                        label: '1:2',
+                        data: [1, 1, 0],
+                        backgroundColor: '#8e44ad'
+                    },
+                    {
+                        label: '1:10',
+                        data: [1, 0, 0],
+                        backgroundColor: '#f39c12'
+                    },
+                    {
+                        label: '1:100',
+                        data: [1, 0, 0],
+                        backgroundColor: '#3498db'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'ELISA Results by Dilution Level'
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Likely SLE', 'Retest Needed', 'No SLE'],
+                datasets: [{
+                    data: [1, 1, 1],
+                    backgroundColor: ['#8e44ad', '#f39c12', '#2ecc71']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Diagnosis Summary'
+                    }
+                }
+            }
+        });
     </script>
 </body>
 </html>
